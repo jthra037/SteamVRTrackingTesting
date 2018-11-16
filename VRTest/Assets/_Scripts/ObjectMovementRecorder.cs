@@ -14,6 +14,7 @@ public struct FrameRecord
 	public float deltaTime;
 	public float gameTime;
 	public float realtime;
+	public long sysTime;
 
 	public void Print()
 	{
@@ -71,6 +72,7 @@ public class ObjectMovementRecorder : MonoBehaviour
 			pos = TrackerReference.position,
 			realtime = Time.realtimeSinceStartup,
 			rot = TrackerReference.rotation,
+			sysTime = DateTime.UtcNow.ToFileTime(),
 		};
 		record.AddLast(newEntry);
 
@@ -116,14 +118,14 @@ public class ObjectMovementRecorder : MonoBehaviour
 		foreach(FrameRecord entry in record)
 		{
 			sr.WriteLine("{0}, RightHand, x = {1}, y = {2}, z = {3}, qw = {4}, qx = {5}, qy = {6}, qz = {7}",
-				entry.pos.x, entry.pos.y, entry.pos.z, entry.rot.w, entry.rot.x, entry.rot.y, entry.rot.z);
+				entry.gameTime, entry.pos.x, entry.pos.y, entry.pos.z, entry.rot.w, entry.rot.x, entry.rot.y, entry.rot.z);
 		}
 		sr.Close();
 	}
 
 	private void OnDestroy()
 	{
-		writeToFile(record, fileName+record.Last.GetHashCode());
+		writeToFile(record, fileName+record.Last.GetHashCode()+".txt");
 	}
 
 	//private Action curriedWriter(FrameRecord[] record, string name)
