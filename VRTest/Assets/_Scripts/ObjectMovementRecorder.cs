@@ -63,6 +63,7 @@ public class ObjectMovementRecorder : MonoBehaviour
 	public void Update()
 	{
 		int id = Time.frameCount % listLength;
+		DateTime now = DateTime.UtcNow;
 		FrameRecord newEntry = new FrameRecord
 		{
 			deltaTime = Time.deltaTime,
@@ -72,7 +73,7 @@ public class ObjectMovementRecorder : MonoBehaviour
 			pos = TrackerReference.position,
 			realtime = Time.realtimeSinceStartup,
 			rot = TrackerReference.rotation,
-			sysTime = DateTime.UtcNow.ToFileTime(),
+			sysTime = (now.Millisecond) + (now.Second * 1000) + (now.Minute * 60 * 1000),
 		};
 		record.AddLast(newEntry);
 
@@ -118,7 +119,7 @@ public class ObjectMovementRecorder : MonoBehaviour
 		foreach(FrameRecord entry in record)
 		{
 			sr.WriteLine("{0}, RightHand, x = {1}, y = {2}, z = {3}, qw = {4}, qx = {5}, qy = {6}, qz = {7}",
-				entry.gameTime, entry.pos.x, entry.pos.y, entry.pos.z, entry.rot.w, entry.rot.x, entry.rot.y, entry.rot.z);
+				entry.sysTime, entry.pos.x, entry.pos.y, entry.pos.z, entry.rot.w, entry.rot.x, entry.rot.y, entry.rot.z);
 		}
 		sr.Close();
 	}
