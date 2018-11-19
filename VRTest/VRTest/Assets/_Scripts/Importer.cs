@@ -107,8 +107,8 @@ public class Importer : MonoBehaviour {
             }
 
 
-            ParseData(firstIndexOVR, lastIndexOVR, linesOVR, animationOVR);
-            ParseData(firstIndexUnity, lastIndexUnity, linesUnity, animationUnity);
+            ParseData(firstIndexOVR, lastIndexOVR, linesOVR, animationOVR, false);
+            ParseData(firstIndexUnity, lastIndexUnity, linesUnity, animationUnity, true);
 
 
 
@@ -116,7 +116,7 @@ public class Importer : MonoBehaviour {
 
     }
 
-    void ParseData(int firstLineIndex, int lastLineIndex, string[] data, AnimationClip animation)
+    void ParseData(int firstLineIndex, int lastLineIndex, string[] data, AnimationClip animation, bool unity)
     {
 
         AnimationCurve positionX = new AnimationCurve();
@@ -141,19 +141,27 @@ public class Importer : MonoBehaviour {
             positionY.AddKey(timestamp, float.Parse(line[3].Substring(4)) * positionFactor);
             positionZ.AddKey(timestamp, float.Parse(line[4].Substring(4)) * positionFactor);
 
-            rotationX.AddKey(timestamp, float.Parse(line[5].Substring(5)) * positionFactor);
-            rotationY.AddKey(timestamp, float.Parse(line[6].Substring(5)) * positionFactor);
-            rotationZ.AddKey(timestamp, float.Parse(line[7].Substring(5)) * positionFactor);
-            rotationW.AddKey(timestamp, float.Parse(line[8].Substring(5)) * positionFactor);
+            Quaternion q = new Quaternion(
+                float.Parse(line[6].Substring(5)),
+                float.Parse(line[7].Substring(5)),
+                float.Parse(line[8].Substring(5)),
+                float.Parse(line[5].Substring(5)));
+
+            //q = Quaternion.identity * q;
+
+            rotationW.AddKey(timestamp, q.w);
+            rotationX.AddKey(timestamp, unity ? -q.x : q.x);
+            rotationY.AddKey(timestamp, unity ? q.y : -q.y);
+            rotationZ.AddKey(timestamp, -q.z);
         }
 
         animation.SetCurve("", typeof(Transform), "m_LocalPosition.x", positionX);
         animation.SetCurve("", typeof(Transform), "m_LocalPosition.y", positionY);
         animation.SetCurve("", typeof(Transform), "m_LocalPosition.z", positionZ);
+        animation.SetCurve("", typeof(Transform), "m_LocalRotation.w", rotationW);
         animation.SetCurve("", typeof(Transform), "m_LocalRotation.x", rotationX);
         animation.SetCurve("", typeof(Transform), "m_LocalRotation.y", rotationY);
         animation.SetCurve("", typeof(Transform), "m_LocalRotation.z", rotationZ);
-        animation.SetCurve("", typeof(Transform), "m_LocalRotation.w", rotationW);
     }
 
     public static float RemapUnclamped(float s, float from1, float from2, float to1, float to2)

@@ -100,6 +100,6 @@ public class ObjectMovementRecorder : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		writeToFile(record, fileName+record.Last.GetHashCode()+".txt");
+		writeToFile(record, fileName+DateTime.Now.Minute + ".txt");
 	}
 }
