@@ -132,6 +132,7 @@ public class Importer : MonoBehaviour {
 
         long firstTimestamp = long.Parse(data[firstLineIndex].Trim().Split(new char[] { ',' }, 9)[0]);
 
+        //int keyIndex = 0;
         for (int i = firstLineIndex; i < lastLineIndex; i++)
         {
             line = data[i].Trim().Split(new char[] { ',' }, 9);
@@ -158,6 +159,9 @@ public class Importer : MonoBehaviour {
             rotationX.AddKey(timestamp, unity ? -q.x : q.x);
             rotationY.AddKey(timestamp, unity ? q.y : -q.y);
             rotationZ.AddKey(timestamp, -q.z);
+
+            
+            //keyIndex++;
         }
 
         animation.SetCurve("", typeof(Transform), "m_LocalPosition.x", positionX);
@@ -167,6 +171,28 @@ public class Importer : MonoBehaviour {
         animation.SetCurve("", typeof(Transform), "m_LocalRotation.x", rotationX);
         animation.SetCurve("", typeof(Transform), "m_LocalRotation.y", rotationY);
         animation.SetCurve("", typeof(Transform), "m_LocalRotation.z", rotationZ);
+
+        animation.EnsureQuaternionContinuity();
+
+        for (int keyIndex = 0; keyIndex < positionX.keys.Length; keyIndex++)
+        {
+
+            AnimationUtility.SetKeyBroken(positionX, keyIndex, true);
+            AnimationUtility.SetKeyBroken(positionY, keyIndex, true);
+            AnimationUtility.SetKeyBroken(positionZ, keyIndex, true);
+            AnimationUtility.SetKeyBroken(rotationX, keyIndex, true);
+            AnimationUtility.SetKeyBroken(rotationY, keyIndex, true);
+            AnimationUtility.SetKeyBroken(rotationZ, keyIndex, true);
+            AnimationUtility.SetKeyBroken(rotationW, keyIndex, true);
+
+            AnimationUtility.SetKeyLeftTangentMode(positionX, keyIndex, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyLeftTangentMode(positionY, keyIndex, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyLeftTangentMode(positionZ, keyIndex, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyLeftTangentMode(rotationX, keyIndex, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyLeftTangentMode(rotationY, keyIndex, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyLeftTangentMode(rotationZ, keyIndex, AnimationUtility.TangentMode.Linear);
+            AnimationUtility.SetKeyLeftTangentMode(rotationW, keyIndex, AnimationUtility.TangentMode.Linear);
+        }
     }
 
     public static float RemapUnclamped(float s, float from1, float from2, float to1, float to2)
