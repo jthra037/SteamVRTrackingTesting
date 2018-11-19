@@ -8,7 +8,9 @@ using UnityEngine;
 public struct FrameRecord
 {
 	public Vector3 pos;
+	public Vector3 localPos;
 	public Quaternion rot;
+	public Quaternion localRot;
 	public Vector3 eulers;
 	public int frameIndex;
 	public float deltaTime;
@@ -61,8 +63,10 @@ public class ObjectMovementRecorder : MonoBehaviour
 			frameIndex = Time.frameCount,
 			gameTime = Time.time,
 			pos = TrackerReference.position,
+			localPos = TrackerReference.localPosition,
 			realtime = Time.realtimeSinceStartup,
 			rot = TrackerReference.rotation,
+			localRot = TrackerReference.localRotation,
 			sysTime = (now.Millisecond) + (now.Second * 1000) + (now.Minute * 60 * 1000),
 		};
 		record.AddLast(newEntry);
@@ -89,7 +93,7 @@ public class ObjectMovementRecorder : MonoBehaviour
 		foreach(FrameRecord entry in record)
 		{
 			sr.WriteLine("{0}, RightHand, x = {1}, y = {2}, z = {3}, qw = {4}, qx = {5}, qy = {6}, qz = {7}",
-				entry.sysTime, entry.pos.x, entry.pos.y, entry.pos.z, entry.rot.w, entry.rot.x, entry.rot.y, entry.rot.z);
+				entry.sysTime, entry.localPos.x, entry.localPos.y, entry.localPos.z, entry.localRot.w, entry.localRot.x, entry.localRot.y, entry.localRot.z);
 		}
 		sr.Close();
 	}
