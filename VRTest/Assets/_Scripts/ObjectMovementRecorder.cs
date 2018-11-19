@@ -40,20 +40,10 @@ public class ObjectMovementRecorder : MonoBehaviour
 	public string fileName;
 
 	private int listID;
-	//private Thread writingThread;
-	//private delegate void recordWriter(FrameRecord[] record);
 
 	public void Start()
 	{
 		listID = 0;
-		//records = new FrameRecord[][] { new FrameRecord[listLength], new FrameRecord[listLength] };
-		//foreach(FrameRecord[] record in records)
-		//{
-		//	for(int i = 0; i < record.Length; i++)
-		//	{
-		//		record[i] = new FrameRecord();
-		//	}
-		//}
 		record = new LinkedList<FrameRecord>();
 
 		if (lr)
@@ -77,15 +67,6 @@ public class ObjectMovementRecorder : MonoBehaviour
 		};
 		record.AddLast(newEntry);
 
-
-		//records[listID][id].deltaTime = Time.deltaTime;
-		//records[listID][id].eulers = TrackerReference.eulerAngles;
-		//records[listID][id].frameIndex = Time.frameCount;
-		//records[listID][id].gameTime = Time.time;
-		//records[listID][id].pos = TrackerReference.position;
-		//records[listID][id].realtime = Time.realtimeSinceStartup;
-		//records[listID][id].rot = TrackerReference.rotation;
-
 		if(lr && renderLine)
 		{
 			lr.SetPosition(id, newEntry.pos);
@@ -95,17 +76,6 @@ public class ObjectMovementRecorder : MonoBehaviour
 		{
 			newEntry.Print();
 		}
-
-		//if (id == listLength - 1)
-		//{
-		//	//if (printToFile)
-		//	//{
-		//	//	writingThread = new Thread(new ThreadStart(curriedWriter(records[listID], (fileName+Time.frameCount+".txt"))));
-		//	//	writingThread.Start();
-		//	//}
-		//
-		//	listID = (listID + 1) % records.Length;
-		//}
 	}
 
 	private void writeToFile(ICollection<FrameRecord> record, string name)
@@ -128,12 +98,4 @@ public class ObjectMovementRecorder : MonoBehaviour
 	{
 		writeToFile(record, fileName+record.Last.GetHashCode()+".txt");
 	}
-
-	//private Action curriedWriter(FrameRecord[] record, string name)
-	//{
-	//	return () =>
-	//	{
-	//		writeToFile(record, name);
-	//	};
-	//}
 }
