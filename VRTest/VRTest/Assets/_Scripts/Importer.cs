@@ -66,7 +66,7 @@ public class Importer : MonoBehaviour {
             int lastIndexUnity = linesUnity.Length - 2;
             
             //find the index of the first common timestamp
-            while (firstIndexOVR < linesOVR.Length && firstIndexUnity < linesUnity.Length)
+            while (true)
             {
                 lineOVR = linesOVR[firstIndexOVR].Split(new char[] { ',' }, 9);
                 lineUnity = linesUnity[firstIndexUnity].Split(new char[] { ',' }, 9);
@@ -87,7 +87,7 @@ public class Importer : MonoBehaviour {
 
 
             //find the index of the last common timestamp
-            while (lastIndexOVR > 0 && lastIndexUnity > 0)
+            while (true)
             {
                 lineOVR = linesOVR[lastIndexOVR].Split(new char[] { ',' }, 9);
                 lineUnity = linesUnity[lastIndexUnity].Split(new char[] { ',' }, 9);
@@ -137,9 +137,14 @@ public class Importer : MonoBehaviour {
             line = data[i].Trim().Split(new char[] { ',' }, 9);
             float timestamp = (long.Parse(line[0]) - firstTimestamp) / 1000f;
 
-            positionX.AddKey(timestamp, float.Parse(line[2].Substring(4)) * positionFactor);
-            positionY.AddKey(timestamp, float.Parse(line[3].Substring(4)) * positionFactor);
-            positionZ.AddKey(timestamp, float.Parse(line[4].Substring(4)) * positionFactor);
+            Vector3 p = new Vector3(
+                float.Parse(line[2].Substring(4)),
+                float.Parse(line[3].Substring(4)),
+                float.Parse(line[4].Substring(4)));
+
+            positionX.AddKey(timestamp, unity ? -p.x : p.x);
+            positionY.AddKey(timestamp, p.y);
+            positionZ.AddKey(timestamp, unity ? -p.z : p.z);
 
             Quaternion q = new Quaternion(
                 float.Parse(line[6].Substring(5)),

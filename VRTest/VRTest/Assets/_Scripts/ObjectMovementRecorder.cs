@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
 
@@ -29,8 +30,10 @@ public struct FrameRecord
 
 public class ObjectMovementRecorder : MonoBehaviour
 {
+    [DllImport("Kernel32.dll", CallingConvention = CallingConvention.Winapi)]
+    private static extern void GetSystemTimePreciseAsFileTime(out long filetime);
 
-	public Transform TrackerReference;
+    public Transform TrackerReference;
 
 	public int listLength = 4000;
 	public LinkedList<FrameRecord> record;
@@ -55,7 +58,10 @@ public class ObjectMovementRecorder : MonoBehaviour
 	public void Update()
 	{
 		int id = Time.frameCount % listLength;
-		DateTime now = DateTime.UtcNow;
+        long filetime;
+        GetSystemTimePreciseAsFileTime(out filetime);
+
+        DateTime now = DateTime.FromFileTimeUtc(filetime);
 		FrameRecord newEntry = new FrameRecord
 		{
 			deltaTime = Time.deltaTime,
