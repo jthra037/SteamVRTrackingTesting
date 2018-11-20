@@ -821,6 +821,7 @@ void CMainApplication::printPositionalData()
 		vr::VRControllerState_t state;
 		if (m_pHMD->GetControllerState(unDevice, &state, sizeof(state)))
 		{
+			vr::ETrackedControllerRole trackedControllerRoleTracker; 
 			vr::TrackedDevicePose_t trackedDevicePose;
 			vr::TrackedDevicePose_t trackedControllerPose;
 			vr::VRControllerState_t controllerState;
@@ -830,25 +831,32 @@ void CMainApplication::printPositionalData()
 			vr::ETrackedDeviceClass trackedDeviceClass = vr::VRSystem()->GetTrackedDeviceClass(unDevice);
 
 			switch (trackedDeviceClass) {
-			case vr::ETrackedDeviceClass::TrackedDeviceClass_HMD:
-				continue;
-				vr::VRSystem()->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseStanding, 0, &trackedDevicePose, 1);
-				// print positiona data for the HMD.
-				poseMatrix = trackedDevicePose.mDeviceToAbsoluteTracking; // This matrix contains all positional and rotational data.
-				position = GetPosition(trackedDevicePose.mDeviceToAbsoluteTracking);
-				quaternion = GetRotation(trackedDevicePose.mDeviceToAbsoluteTracking);
-
-				printDevicePositionalData("HMD", poseMatrix, position, quaternion);
-
-				break;
 
 			case vr::ETrackedDeviceClass::TrackedDeviceClass_GenericTracker:
-				vr::VRSystem()->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseStanding, 0, &trackedDevicePose, 1);
-				// print positiona data for a general vive tracker.
+				vr::VRSystem()->GetControllerStateWithPose(vr::TrackingUniverseStanding, unDevice, &controllerState,
+					sizeof(controllerState), &trackedControllerPose);
+
+				poseMatrix = trackedControllerPose.mDeviceToAbsoluteTracking; // This matrix contains all positional and rotational data.
+				position = GetPosition(trackedControllerPose.mDeviceToAbsoluteTracking);
+				quaternion = GetRotation(trackedControllerPose.mDeviceToAbsoluteTracking);
+
+				printDevicePositionalData("Tracker", poseMatrix, position, quaternion);
 				break;
 
+			//case vr::ETrackedDeviceClass::TrackedDeviceClass_HMD:
+			//	
+			//	vr::VRSystem()->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseStanding, 0, &trackedDevicePose, 1);
+			//	// print positiona data for the HMD.
+			//	poseMatrix = trackedDevicePose.mDeviceToAbsoluteTracking; // This matrix contains all positional and rotational data.
+			//	position = GetPosition(trackedDevicePose.mDeviceToAbsoluteTracking);
+			//	quaternion = GetRotation(trackedDevicePose.mDeviceToAbsoluteTracking);
+
+			//	printDevicePositionalData("HMD", poseMatrix, position, quaternion);
+
+			//	break;
+
 			case vr::ETrackedDeviceClass::TrackedDeviceClass_Controller:
-				vr::VRSystem()->GetControllerStateWithPose(vr::TrackingUniverseStanding, unDevice, &controllerState,
+				vr::VRSystem()->GetControllerStateWithPose(vr::TrackingUniverseStanding, 0, &controllerState,
 					sizeof(controllerState), &trackedControllerPose);
 				poseMatrix = trackedControllerPose.mDeviceToAbsoluteTracking; // This matrix contains all positional and rotational data.
 				position = GetPosition(trackedControllerPose.mDeviceToAbsoluteTracking);
